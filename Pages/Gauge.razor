@@ -1,0 +1,34 @@
+﻿@page "/gauge"
+
+<RadzenRadialGauge Style="width: 100%; height: 500px;">
+    <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="@step" Min="0" Max="@rangeMax" TickPosition="@GaugeTickPosition.Outside">
+        <RadzenRadialGaugeScalePointer Value="@value" Length="0.8" ShowValue="@false"/>
+        <RadzenRadialGaugeScaleRange From="0" To="@rangeMaxGreen" Fill="green" />
+        <RadzenRadialGaugeScaleRange From="@rangeMaxGreen" To="@rangeMaxOrange" Fill="orange" />
+        <RadzenRadialGaugeScaleRange From="@rangeMaxOrange" To="@rangeMax" Fill="red" />
+    </RadzenRadialGaugeScale>
+</RadzenRadialGauge>
+
+@code {
+    private double rangeMaxGreen = rangeMax * 1/3;
+    private double rangeMaxOrange = rangeMax * 2/3;
+    private const double rangeMax = 100; // set max
+    private double value = rangeMax / 2;
+    private const double multiplier = (rangeMax * 0.69) / rangeMax;
+    private const double step = rangeMax / 10;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(GenerateRandomValueLoop);
+    }
+
+    async Task GenerateRandomValueLoop()
+    {
+        while (true)
+        {
+            value += (Random.Shared.NextDouble() - 0.5) * multiplier;
+            await Task.Delay(1);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

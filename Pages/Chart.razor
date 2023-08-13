@@ -1,0 +1,54 @@
+﻿@page "/chart"
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 my-5">
+            <RadzenChart>
+                <RadzenLineSeries Smooth="@smoothChart" Data="@chart1" CategoryProperty="Id" Title="1" ValueProperty="Value">
+                    <RadzenMarkers MarkerType="MarkerType.None" />
+                </RadzenLineSeries>
+                <RadzenLineSeries Smooth="@smoothChart" Data="@chart2" CategoryProperty="Id" Title="2" ValueProperty="Value">
+                    <RadzenMarkers MarkerType="MarkerType.None" />
+                </RadzenLineSeries>
+                <RadzenCategoryAxis Padding="20" Formatter="@FormatIndex" />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Progress" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </div>
+    </div>
+</div>
+
+@code {
+    bool smoothChart = true;
+    List<ChartPoint> chart1 = new() { new ChartPoint(0,0) };
+    List<ChartPoint> chart2 = new() { new ChartPoint(0,0) };
+    
+    static string FormatIndex(object? value) => value != null ? Convert.ToInt32(value).ToString() : string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(AddValuesLoop);
+    }
+
+    async Task AddValuesLoop()
+    {
+        while (true)
+        {
+            int lastIndex = chart1.Last().Id;
+            lastIndex++;
+
+            double lastChart1Value = chart1.Last().Value;
+            double newChart1Value = lastChart1Value + Random.Shared.Next(0, 4);
+            chart1.Add(new ChartPoint(lastIndex, newChart1Value));
+
+            double lastChart2Value = chart2.Last().Value;
+            double newChart2Value = lastChart2Value + Random.Shared.Next(0, 2);
+            chart2.Add(new ChartPoint(lastIndex, newChart2Value));
+
+            await Task.Delay(100);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}
