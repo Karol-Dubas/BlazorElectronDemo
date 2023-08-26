@@ -1,0 +1,39 @@
+﻿@page "/database"
+@inject ItemsService ItemsService
+
+<input @bind="@_name"/>
+<button @onclick="Add">add</button>
+
+<ul>
+    @foreach (var item in _items)
+    {
+        <li>@item.Name <button @onclick="() => Remove(item.Id)">delete</button></li>
+    }
+</ul>
+
+@code {
+    List<Item> _items = new();
+    string _name = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetItems();
+    }
+
+    async Task GetItems()
+    {
+        _items = await ItemsService.GetAll();
+    }
+
+    async Task Add()
+    {
+        await ItemsService.Add(_name);
+        await GetItems();
+    }
+    
+    async Task Remove(int id)
+    {
+        await ItemsService.Remove(id);
+        await GetItems();
+    }
+}

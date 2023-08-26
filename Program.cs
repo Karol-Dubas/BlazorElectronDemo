@@ -1,6 +1,7 @@
 using BlazorElectronDemo.Data;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
+using Microsoft.EntityFrameworkCore;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,12 +11,17 @@ builder.WebHost.UseElectron(args);
 builder.Services.AddElectron();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
+
+// TODO: app.db in solution (migrations etc.) != app.db in build folder (..\obj\Host\bin\app.db)
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));
+
+builder.Services.AddScoped<ItemsService>();
+builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 
